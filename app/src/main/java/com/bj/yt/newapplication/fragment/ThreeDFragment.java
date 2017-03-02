@@ -73,8 +73,8 @@ public class ThreeDFragment extends BaseFragment {
                 return super.shouldOverrideUrlLoading(view, url);
             }
         });
-//        webView.loadUrl("file:///android_asset/load_remote.html");
-        webView.loadUrl("https://baidu.com");
+        webView.loadUrl("file:///android_asset/load_remote.html");
+//        webView.loadUrl("https://baidu.com");
     }
 
 
