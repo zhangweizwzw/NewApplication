@@ -52,6 +52,7 @@
             android:screenOrientation="portrait"
             android:label="依赖界面"/>
 
+        <!-- 百度地图service -->
         <service
             android:name="com.baidu.location.f"
             android:enabled="true"
@@ -64,6 +65,13 @@
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="hdEPmVTmpFdGHyUaTNLVFHe5WpSE1u9P" />
+
+        <!--监听时间变化-->
+        <receiver android:name=".service.TimeReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

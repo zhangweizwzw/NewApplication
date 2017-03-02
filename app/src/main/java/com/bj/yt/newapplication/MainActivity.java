@@ -1,5 +1,9 @@
 package com.bj.yt.newapplication;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Intent;
+import android.os.SystemClock;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +16,7 @@ import android.widget.TextView;
 import com.bj.yt.newapplication.fragment.LocationFragment;
 import com.bj.yt.newapplication.fragment.MessageFragment;
 import com.bj.yt.newapplication.fragment.ThreeDFragment;
+import com.bj.yt.newapplication.service.TimeReceiver;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
     // 定义Fragment对象
@@ -37,10 +42,25 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        startAlarmManager();
+
         fragmentManager = getSupportFragmentManager();
         initView(); // 初始化界面控件
         setChioceItem(0);   // 初始化页面加载时显示第一个选项卡
     }
+
+    private void startAlarmManager() {
+        Intent intent =new Intent(MainActivity.this, TimeReceiver.class);
+        intent.setAction("repeating");
+        PendingIntent sender=PendingIntent.getBroadcast(MainActivity.this, 0, intent, 0);
+        //开始时间
+        long firstime=SystemClock.elapsedRealtime();
+
+        AlarmManager am=(AlarmManager)getSystemService(ALARM_SERVICE);
+        //5秒一个周期，不停的发送广播
+        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstime, 10*1000, sender);
+    }
+
 
     /**
      * 初始化页面
