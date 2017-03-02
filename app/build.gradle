@@ -28,7 +28,7 @@ android {
         config {
             keyAlias 'yatu'
             keyPassword '123456'
-            storeFile file('E:/workspaces5/DemoList/newapplication.jks')
+            storeFile file("newapplication.jks")
             storePassword '123456'
         }
     }
@@ -53,6 +53,7 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:25.2.0'
     compile 'com.android.support:support-v4:25.2.0'
+    compile 'com.zhy:okhttputils:2.4.1'
     testCompile 'junit:junit:4.12'
     compile files('libs/arcgis-android-api.jar')
     compile files('libs/jackson-core-1.9.5.jar')
