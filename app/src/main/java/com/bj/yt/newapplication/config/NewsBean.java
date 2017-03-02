@@ -21,6 +21,15 @@ public class NewsBean {
     private int submitUserId;
     private int acceptUserId;
     private String context;
+    private boolean isme;
+
+    public boolean getIsme() {
+        return isme;
+    }
+
+    public void setIsme(boolean isme) {
+        this.isme = isme;
+    }
 
     public int getId() {
         return id;

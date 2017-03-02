@@ -65,7 +65,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     //用户登录
                     OkHttpUtils
                             .post()
-                            .url(Strings.LOGIN_URL+"login")
+                            .url(Strings.REQUEST_URL+"login")
                             .addParams("userName",username)
                             .addParams("password",password)
                             .build()

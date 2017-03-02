@@ -34,7 +34,14 @@ public class TimeReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if(intent.getAction().equals("repeating")){
             Log.i(TAG,"过了10秒钟");
-           initData();
+//           initData();
+            String response="[{\"id\":3,\"submitTime\":\"2017-03-02T10:01:12.581+0000\",\"sendTime\":null,\"submitUserId\":3,\"acceptUserId\":0,\"context\":\"a\"},{\"id\":1,\"submitTime\":\"2017-03-02T10:01:12.581+0000\",\"sendTime\":null,\"submitUserId\":1,\"acceptUserId\":0,\"context\":\"aaaaa\"},{\"id\":2,\"submitTime\":\"2017-03-02T10:01:12.581+0000\",\"sendTime\":null,\"submitUserId\":2,\"acceptUserId\":0,\"context\":\"bbbbbb\"},{\"id\":4,\"submitTime\":\"2017-03-02T10:01:12.581+0000\",\"sendTime\":null,\"submitUserId\":4,\"acceptUserId\":0,\"context\":\"b\"},{\"id\":5,\"submitTime\":\"2017-03-02T10:01:12.581+0000\",\"sendTime\":null,\"submitUserId\":5,\"acceptUserId\":0,\"context\":\"c\"},{\"id\":11,\"submitTime\":\"2017-03-02T10:01:12.581+0000\",\"sendTime\":null,\"submitUserId\":11,\"acceptUserId\":0,\"context\":\"11\"},{\"id\":7,\"submitTime\":\"2017-03-02T10:01:12.581+0000\",\"sendTime\":null,\"submitUserId\":5,\"acceptUserId\":0,\"context\":\"15\"},{\"id\":8,\"submitTime\":\"2017-03-02T10:01:12.581+0000\",\"sendTime\":null,\"submitUserId\":55,\"acceptUserId\":0,\"context\":\"4654\"},{\"id\":9,\"submitTime\":\"2017-03-02T10:01:12.581+0000\",\"sendTime\":null,\"submitUserId\":9,\"acceptUserId\":0,\"context\":\"599\"},{\"id\":10,\"submitTime\":\"2017-03-02T10:01:12.581+0000\",\"sendTime\":null,\"submitUserId\":55,\"acceptUserId\":0,\"context\":\"888\"},{\"id\":6,\"submitTime\":\"2017-03-02T10:01:12.583+0000\",\"sendTime\":null,\"submitUserId\":6,\"acceptUserId\":0,\"context\":\"56\"}]";
+
+            Gson gson=new Gson();
+            NewsBean newsBean=new NewsBean();
+            Type listType=new TypeToken<List<NewsBean>>(){}.getType();
+            MyApplication.newsList=gson.fromJson(response,listType);
+            EventBus.getDefault().post(new MessageEvent("newmessage"));
         }
     }
 
