@@ -28,7 +28,8 @@ android {
         config {
             keyAlias 'yatu'
             keyPassword '123456'
-            storeFile file("newapplication.jks")
+//            storeFile file("newapplication.jks")
+            storeFile file("E:/workspaces7/NewApplication/newapplication.jks")
             storePassword '123456'
         }
     }

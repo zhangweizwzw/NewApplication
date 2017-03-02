@@ -41,7 +41,7 @@
 
         <activity android:name=".LoginActivity"
             android:screenOrientation="portrait"
-            android:label="登录界面">
+            android:label="天水社棠工业园区">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

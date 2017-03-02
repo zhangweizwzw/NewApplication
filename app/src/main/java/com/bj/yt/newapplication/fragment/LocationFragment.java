@@ -14,6 +14,7 @@ import com.baidu.location.BDLocationListener;
 import com.bj.yt.newapplication.R;
 import com.bj.yt.newapplication.common.MyApplication;
 import com.bj.yt.newapplication.service.LocationService;
+import com.bj.yt.newapplication.util.GpsUtil;
 import com.esri.android.map.GraphicsLayer;
 import com.esri.android.map.LocationDisplayManager;
 import com.esri.android.map.MapView;
@@ -51,8 +52,31 @@ public class LocationFragment extends BaseFragment {
         view = inflater.inflate(R.layout.fragment_location, container, false);
 
         initView();
-        initData();
+        isGps();
+
         return view;
+    }
+
+    public void isGps() {
+        if(GpsUtil.hasGPSDevice(getActivity())){
+            map.addLayer(new ArcGISTiledMapServiceLayer("http://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer"));
+            map.setOnStatusChangedListener(new OnStatusChangedListener() {
+                public void onStatusChanged(Object source, STATUS status) {
+                    if (source == map && status == STATUS.INITIALIZED) {
+
+                        LocationDisplayManager ldm = map.getLocationDisplayManager();
+                        ldm.setAutoPanMode(LocationDisplayManager.AutoPanMode.LOCATION);
+                        ldm.start();
+                        //移动到当前位置
+                        ShowLocation(ldm.getLocation().getLongitude(),ldm.getLocation().getLatitude());
+                    }
+                }
+            });
+            graphicsLayer = new GraphicsLayer();
+            map.addLayer(graphicsLayer);
+        }else{
+            initData();
+        }
     }
 
     private void initView() {
@@ -87,7 +111,7 @@ public class LocationFragment extends BaseFragment {
                     ldm.setAutoPanMode(LocationDisplayManager.AutoPanMode.LOCATION);
                     ldm.start();
                     //移动到当前位置
-                    ShowLocation(116.255595,39.902287);
+                    ShowLocation(lon,lat);
                 }
             }
         });
@@ -133,16 +157,16 @@ public class LocationFragment extends BaseFragment {
                 Log.i(TAG,"latitude:"+bLocation.getLatitude());
                 Log.i(TAG,"longitude:"+bLocation.getLongitude());
 
-//                //解决百度地图获取位置偏移
-//                double x = bLocation.getLongitude();
-//                double y = bLocation.getLatitude();
-//                double z = Math.sqrt(x*x+y*y) + 0.00002 *Math.sin(y*Math.PI) ;
-//                double temp =Math.atan2(y, x)  + 0.000003 * Math.cos(x*Math.PI);
-//                lon = z * Math.cos(temp) + 0.0065;
-//                lat = z * Math.sin(temp) + 0.006;
+                //解决百度地图获取位置偏移
+                double x = bLocation.getLongitude();
+                double y = bLocation.getLatitude();
+                double z = Math.sqrt(x*x+y*y) + 0.00002 *Math.sin(y*Math.PI) ;
+                double temp =Math.atan2(y, x)  + 0.000003 * Math.cos(x*Math.PI);
+                lon = z * Math.cos(temp) + 0.0065;
+                lat = z * Math.sin(temp) + 0.006;
 
-                lat=bLocation.getLatitude();
-                lon=bLocation.getLongitude();
+//                lat=bLocation.getLatitude();
+//                lon=bLocation.getLongitude();
 
                 Message message=new Message();
                 message.what=1;
@@ -165,6 +189,7 @@ public class LocationFragment extends BaseFragment {
         super.onResume();
         map.unpause();
     }
+
 }
 
 

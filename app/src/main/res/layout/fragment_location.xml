@@ -14,6 +14,4 @@
         android:layout_below="@id/title_bar"
         mapoptions.MapType="Streets">
     </com.esri.android.map.MapView>
-
-
 </RelativeLayout>
