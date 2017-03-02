@@ -3,6 +3,7 @@ package com.bj.yt.newapplication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,8 +12,15 @@ import android.widget.Toast;
 
 import com.bj.yt.newapplication.config.Strings;
 import com.bj.yt.newapplication.config.UserBean;
+import com.bj.yt.newapplication.utils.JasonUtils;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import okhttp3.Call;
 
@@ -55,9 +63,13 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     Toast.makeText(LoginActivity.this, Strings.LOGIN_NULL,Toast.LENGTH_SHORT).show();
                 }else{
                     //用户登录
-                    OkHttpUtils.post().url(Strings.LOGIN_URL)
-                    .addParams("userName",username).addParams("password",password)
-                    .build().execute(new StringCallback() {
+                    OkHttpUtils
+                            .post()
+                            .url(Strings.LOGIN_URL+"login")
+                            .addParams("userName",username)
+                            .addParams("password",password)
+                            .build()
+                            .execute(new StringCallback() {
                         @Override
                         public void onError(Call call, Exception e) {
                             Toast.makeText(LoginActivity.this,Strings.LOGIN_Fail,Toast.LENGTH_SHORT).show();
@@ -65,12 +77,28 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
                         @Override
                         public void onResponse(String response) {
+                            Map<String,List<UserBean>> map= JasonUtils.getUserJson(response);
+                            if (map!=null){
+                                Set set=map.keySet();
+                                Iterator iter = set.iterator();
+                                while (iter.hasNext()) {
+                                    String key = (String) iter.next();
+                                    if (key!=null&&key.equals("0")){
+                                        startActivity(new Intent(LoginActivity.this,MainActivity.class));
+                                    }else{
+                                        Toast.makeText(LoginActivity.this,Strings.LOGIN_Fail,Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            }else{
+                                Toast.makeText(LoginActivity.this,Strings.LOGIN_Fail,Toast.LENGTH_SHORT).show();
+                            }
 
 
                         }
                     });
+
                 }
-                startActivity(new Intent(LoginActivity.this,MainActivity.class));
+
                 break;
         }
     }

@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.JsResult;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -39,7 +40,13 @@ public class ThreeDFragment extends BaseFragment {
         title_center.setText("3D展示");
 
         webView= (WebView) view.findViewById(R.id.web_threed);
-        webView.setWebChromeClient(new WebChromeClient());
+//        webView.setWebChromeClient(new WebChromeClient());
+        webView.setWebChromeClient(new WebChromeClient(){
+            @Override
+            public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
+                return super.onJsAlert(view, url, message, result);
+            }//如果不设置这个，JS代码中的按钮会显示，但是按下去却不弹出对话框
+        });
 
         mWebSettings = webView.getSettings();
         mWebSettings.setJavaScriptEnabled(true); // 允许加载javascript
