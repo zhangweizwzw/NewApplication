@@ -68,8 +68,9 @@ public class LocationFragment extends BaseFragment {
                         ldm.setAutoPanMode(LocationDisplayManager.AutoPanMode.LOCATION);
                         ldm.start();
                         //移动到当前位置
-                        ShowLocation(ldm.getLocation().getLongitude(),ldm.getLocation().getLatitude());
+//                        ShowLocation(ldm.getLocation().getLongitude(),ldm.getLocation().getLatitude());
                     }
+
                 }
             });
             graphicsLayer = new GraphicsLayer();

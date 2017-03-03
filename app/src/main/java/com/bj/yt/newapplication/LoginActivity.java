@@ -1,6 +1,9 @@
 package com.bj.yt.newapplication;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -34,6 +37,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         setContentView(R.layout.activity_login);
 
         initView();
+
     }
 
     private void initView() {
@@ -57,8 +61,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 break;
             case R.id.btn_login:
 //                startActivity(new Intent(LoginActivity.this,MainActivity.class));
-                String username=et_username.getText().toString().trim();
-                String password=et_password.getText().toString().trim();
+                final String username=et_username.getText().toString().trim();
+                final String password=et_password.getText().toString().trim();
                 //用户名或密码为空
                 if (TextUtils.isEmpty(username)||TextUtils.isEmpty(password)){
                     Toast.makeText(LoginActivity.this, Strings.LOGIN_NULL,Toast.LENGTH_SHORT).show();
@@ -80,12 +84,17 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                         public void onResponse(String response) {
                             Map<String,List<UserBean>> map= JasonUtils.getUserJson(response);
                             if (map!=null){
+                                Log.i("<<<<<",map+"");
                                 Set set=map.keySet();
                                 Iterator iter = set.iterator();
                                 while (iter.hasNext()) {
                                     String key = (String) iter.next();
                                     if (key!=null&&key.equals("0")){
+                                        //保存用户名和密码
+                                        SharedPreferences share=getSharedPreferences("info",MODE_PRIVATE);
+                                        share.edit().putString("userName",username).putString("password",password).commit();
                                         startActivity(new Intent(LoginActivity.this,MainActivity.class));
+                                        finish();
                                     }else{
                                         Toast.makeText(LoginActivity.this,Strings.LOGIN_Fail,Toast.LENGTH_SHORT).show();
                                     }
@@ -93,7 +102,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                             }else{
                                 Toast.makeText(LoginActivity.this,Strings.LOGIN_Fail,Toast.LENGTH_SHORT).show();
                             }
-
 
                         }
                     });

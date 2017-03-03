@@ -2,12 +2,18 @@ package com.bj.yt.newapplication;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.os.SystemClock;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
@@ -41,12 +47,53 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        //判断网络是否连接
+        checkNetworkState();
+        //判断是否已登录
+        SharedPreferences sharedPreferences=getSharedPreferences("info",MODE_PRIVATE);
+        if (sharedPreferences==null){
+            startActivity(new Intent(MainActivity.this,LoginActivity.class));
+        }
+        String un=sharedPreferences.getString("userNaeme","");
+        String pw=sharedPreferences.getString("password","");
+                Log.i("<<取得的用户名密码<<",un+","+pw);
         startAlarmManager();
 
         fragmentManager = getSupportFragmentManager();
         initView(); // 初始化界面控件
         setChioceItem(0);   // 初始化页面加载时显示第一个选项卡
+    }
+
+    /**
+     * 判断网络是否连接
+     */
+    private void checkNetworkState() {
+
+        //得到网络连接信息
+        ConnectivityManager con=(ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        //判断网络是否连接
+
+        if (con.getActiveNetworkInfo()==null||!con.getActiveNetworkInfo().isAvailable()){
+            Log.i("<<<<<","进入alert设置");
+            AlertDialog.Builder alert=new AlertDialog.Builder(this);
+            alert.setTitle("提示");
+            alert.setMessage("当前无网络");
+            alert.setCancelable(false);
+            alert.setPositiveButton("设置", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    startActivity(new Intent(android.provider.Settings.ACTION_WIFI_SETTINGS));
+                }
+            });
+            alert.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    finish();
+                }
+            });
+            alert.create();
+            alert.show();
+        }
     }
 
     private void startAlarmManager() {

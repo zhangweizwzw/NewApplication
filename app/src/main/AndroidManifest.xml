@@ -37,15 +37,16 @@
         <activity android:name=".MainActivity"
             android:screenOrientation="portrait"
             android:label="主界面">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
 
         <activity android:name=".LoginActivity"
             android:screenOrientation="portrait"
             android:label="天水社棠工业园区">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+
         </activity>
 
         <activity android:name=".BaseActivity"
