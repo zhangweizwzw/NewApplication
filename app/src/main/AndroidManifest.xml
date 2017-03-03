@@ -53,22 +53,23 @@
             android:screenOrientation="portrait"
             android:label="依赖界面"/>
 
-        <!-- 百度地图service -->
-        <service
-            android:name="com.baidu.location.f"
-            android:enabled="true"
-            android:process=":remote" >
-            <intent-filter>
-                <action android:name="com.baidu.location.service_v2.2" >
-                </action>
-            </intent-filter>
-        </service>
-        <meta-data
-            android:name="com.baidu.lbsapi.API_KEY"
-            android:value="hdEPmVTmpFdGHyUaTNLVFHe5WpSE1u9P" />
 
-        <!--监听时间变化-->
-        <receiver android:name=".service.TimeReceiver">
+        <!-- 高德设置key -->
+        <meta-data
+            android:name="com.amap.api.v2.apikey"
+            android:value="6210bc30b0bada8f60c4a60c30a54656" />
+        <!-- 定位需要的服务 -->
+        <service android:name="com.amap.api.location.APSService" >
+        </service>
+
+        <!--监听是否有新信息-->
+        <receiver android:name=".receiver.MessageReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
+            </intent-filter>
+        </receiver>
+        <!--定时上传坐标-->
+        <receiver android:name=".receiver.LocationReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
             </intent-filter>

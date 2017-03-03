@@ -3,18 +3,15 @@ package com.bj.yt.newapplication.fragment;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.baidu.location.BDLocation;
-import com.baidu.location.BDLocationListener;
 import com.bj.yt.newapplication.R;
 import com.bj.yt.newapplication.common.MyApplication;
-import com.bj.yt.newapplication.service.LocationService;
-import com.bj.yt.newapplication.util.GpsUtil;
+import com.bj.yt.newapplication.config.MessageEvent;
+import com.bj.yt.newapplication.util.Locationutil;
 import com.esri.android.map.GraphicsLayer;
 import com.esri.android.map.LocationDisplayManager;
 import com.esri.android.map.MapView;
@@ -26,58 +23,36 @@ import com.esri.core.geometry.SpatialReference;
 import com.esri.core.map.Graphic;
 import com.esri.core.symbol.PictureMarkerSymbol;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 public class LocationFragment extends BaseFragment {
     private final String TAG="LocationFragment";
     private  View view;
     private TextView title_center;
     private MapView map;
     private GraphicsLayer graphicsLayer;
-    private LocationService locationService;
     private Double lat,lon;
-
     Handler handler=new Handler(){
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what){
                 case 1:
-                    MeLocation();
-                break;
+                    initData();
+                    break;
             }
         }
     };
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_location, container, false);
 
+        //获取经纬度信息
+        Locationutil.goLocation(getActivity());
+
         initView();
-        isGps();
-
         return view;
-    }
-
-    public void isGps() {
-        if(GpsUtil.hasGPSDevice(getActivity())){
-            map.addLayer(new ArcGISTiledMapServiceLayer("http://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer"));
-            map.setOnStatusChangedListener(new OnStatusChangedListener() {
-                public void onStatusChanged(Object source, STATUS status) {
-                    if (source == map && status == STATUS.INITIALIZED) {
-
-                        LocationDisplayManager ldm = map.getLocationDisplayManager();
-                        ldm.setAutoPanMode(LocationDisplayManager.AutoPanMode.LOCATION);
-                        ldm.start();
-                        //移动到当前位置
-//                        ShowLocation(ldm.getLocation().getLongitude(),ldm.getLocation().getLatitude());
-                    }
-
-                }
-            });
-            graphicsLayer = new GraphicsLayer();
-            map.addLayer(graphicsLayer);
-        }else{
-            initData();
-        }
     }
 
     private void initView() {
@@ -86,19 +61,32 @@ public class LocationFragment extends BaseFragment {
         title_center.setText("位置");
     }
 
+//    public void isGps() {
+//        if(GpsUtil.hasGPSDevice(getActivity())){
+//            map.addLayer(new ArcGISTiledMapServiceLayer("http://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer"));
+//            map.setOnStatusChangedListener(new OnStatusChangedListener() {
+//                public void onStatusChanged(Object source, STATUS status) {
+//                    if (source == map && status == STATUS.INITIALIZED) {
+//
+//                        LocationDisplayManager ldm = map.getLocationDisplayManager();
+//                        ldm.setAutoPanMode(LocationDisplayManager.AutoPanMode.LOCATION);
+//                        ldm.start();
+//                        //移动到当前位置
+//                        ShowLocation(MyApplication.newlon,MyApplication.newlat);
+//                    }
+//                }
+//            });
+//            graphicsLayer = new GraphicsLayer();
+//            map.addLayer(graphicsLayer);
+//        }else{
+//            initData();
+//        }
+//    }
+
+
+
     private void initData() {
-        // -----------location config ------------
-        locationService = ((MyApplication)getActivity().getApplication()).locationService;
-        //获取locationservice实例，建议应用中只初始化1个location实例，然后使用，可以参考其他示例的activity，都是通过此种方式获取locationservice实例的
-        locationService.registerListener(mListener);
-        //注册监听
-        int type = getActivity().getIntent().getIntExtra("from", 0);
-        if (type == 0) {
-            locationService.setLocationOption(locationService.getDefaultLocationClientOption());
-        } else if (type == 1) {
-            locationService.setLocationOption(locationService.getOption());
-        }
-        locationService.start();// 启动定位SDK
+        System.out.println("yyyyyyyyyyyy");
         /**
          * 获取地图和XML布局的初始程度
          *添加动态层MapView
@@ -112,7 +100,8 @@ public class LocationFragment extends BaseFragment {
                     ldm.setAutoPanMode(LocationDisplayManager.AutoPanMode.LOCATION);
                     ldm.start();
                     //移动到当前位置
-                    ShowLocation(lon,lat);
+                    System.out.println("llllllllll:"+MyApplication.newlon);
+                    ShowLocation(MyApplication.newlon,MyApplication.newlat);
                 }
             }
         });
@@ -120,19 +109,16 @@ public class LocationFragment extends BaseFragment {
         map.addLayer(graphicsLayer);
     }
 
-    public void MeLocation(){
-        map.setOnStatusChangedListener(new OnStatusChangedListener() {
-            public void onStatusChanged(Object source, STATUS status) {
-                if (source == map && status == STATUS.INITIALIZED) {
+    @Subscribe
+    public void onEventMainThread(MessageEvent event){
+        if(event.message.toString().equals("locationUpdate")){
+            System.out.println("aaaaaaaaaaaaaaa");
 
-                    LocationDisplayManager ldm = map.getLocationDisplayManager();
-                    ldm.setAutoPanMode(LocationDisplayManager.AutoPanMode.LOCATION);
-                    ldm.start();
-                    //移动到当前位置
-                    ShowLocation(lon,lat);
-                }
-            }
-        });
+            Message message=new Message();
+            message.what=1;
+            handler.sendMessage(message);
+
+        }
     }
 
     //将地图移动到当前位置
@@ -145,39 +131,13 @@ public class LocationFragment extends BaseFragment {
         map.centerAt(mapPoint, true);// 漫游到当前位置
     }
 
-    /*****
-     *
-     * 定位结果回调，重写onReceiveLocation方法，可以直接拷贝如下代码到自己工程中修改
-     *
-     */
-    private BDLocationListener mListener = new BDLocationListener() {
-        @Override
-        public void onReceiveLocation(BDLocation bLocation) {
-            // TODO Auto-generated method stub
-            if (null != bLocation && bLocation.getLocType() != BDLocation.TypeServerError) {
-                Log.i(TAG,"latitude:"+bLocation.getLatitude());
-                Log.i(TAG,"longitude:"+bLocation.getLongitude());
-
-                //解决百度地图获取位置偏移
-                double x = bLocation.getLongitude();
-                double y = bLocation.getLatitude();
-                double z = Math.sqrt(x*x+y*y) + 0.00002 *Math.sin(y*Math.PI) ;
-                double temp =Math.atan2(y, x)  + 0.000003 * Math.cos(x*Math.PI);
-                lon = z * Math.cos(temp) + 0.0065;
-                lat = z * Math.sin(temp) + 0.006;
-
-//                lat=bLocation.getLatitude();
-//                lon=bLocation.getLongitude();
-
-                Message message=new Message();
-                message.what=1;
-                handler.sendMessage(message);
-            }
+    @Override
+    public void onStart() {
+        super.onStart();
+        if(!EventBus.getDefault().isRegistered(this)){
+            EventBus.getDefault().register(this);
         }
-
-        public void onConnectHotSpotMessage(String s, int i){
-        }
-    };
+    }
 
     @Override
     public void onPause() {
@@ -189,6 +149,14 @@ public class LocationFragment extends BaseFragment {
     public void onResume() {
         super.onResume();
         map.unpause();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(EventBus.getDefault().isRegistered(this)){
+            EventBus.getDefault().unregister(this);
+        }
     }
 
 }

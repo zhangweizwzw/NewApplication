@@ -2,6 +2,7 @@ package com.bj.yt.newapplication.fragment;
 
 import android.os.Bundle;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,7 @@ import org.greenrobot.eventbus.Subscribe;
 import java.util.Date;
 
 public class MessageFragment extends BaseFragment implements View.OnClickListener {
+    private String TAG="MessageFragment";
     private View view;
     private TextView title_center;
     private ListView msglist;
@@ -41,7 +43,7 @@ public class MessageFragment extends BaseFragment implements View.OnClickListene
 
     @Subscribe
     public void onEventMainThread(MessageEvent event){
-        System.out.println("hhhhhhhhhhhhhhhhh");
+        Log.i(TAG,"消息有更新");
         if(event.message.toString().equals("newmessage")){
 //            System.out.println("接收到新消息");
             chatMsgViewAdapter.notifyDataSetChanged();
@@ -109,10 +111,3 @@ public class MessageFragment extends BaseFragment implements View.OnClickListene
         sendmsg_edit.setText("");
     }
 }
-//    private int id;
-//    private String submitTime;
-//    private Object sendTime;
-//    private int submitUserId;
-//    private int acceptUserId;
-//    private String context;
-//    private boolean isme;
