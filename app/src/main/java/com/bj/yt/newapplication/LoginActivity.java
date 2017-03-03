@@ -56,49 +56,49 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 et_password.setText("");
                 break;
             case R.id.btn_login:
-                startActivity(new Intent(LoginActivity.this,MainActivity.class));
-//                String username=et_username.getText().toString().trim();
-//                String password=et_password.getText().toString().trim();
-//                //用户名或密码为空
-//                if (TextUtils.isEmpty(username)||TextUtils.isEmpty(password)){
-//                    Toast.makeText(LoginActivity.this, Strings.LOGIN_NULL,Toast.LENGTH_SHORT).show();
-//                }else{
-//                    //用户登录
-//                    OkHttpUtils
-//                            .post()
-//                            .url(Strings.REQUEST_URL+"login")
-//                            .addParams("userName",username)
-//                            .addParams("password",password)
-//                            .build()
-//                            .execute(new StringCallback() {
-//                        @Override
-//                        public void onError(Call call, Exception e) {
-//                            Toast.makeText(LoginActivity.this,Strings.LOGIN_Fail,Toast.LENGTH_SHORT).show();
-//                        }
-//
-//                        @Override
-//                        public void onResponse(String response) {
-//                            Map<String,List<UserBean>> map= JasonUtils.getUserJson(response);
-//                            if (map!=null){
-//                                Set set=map.keySet();
-//                                Iterator iter = set.iterator();
-//                                while (iter.hasNext()) {
-//                                    String key = (String) iter.next();
-//                                    if (key!=null&&key.equals("0")){
-//                                        startActivity(new Intent(LoginActivity.this,MainActivity.class));
-//                                    }else{
-//                                        Toast.makeText(LoginActivity.this,Strings.LOGIN_Fail,Toast.LENGTH_SHORT).show();
-//                                    }
-//                                }
-//                            }else{
-//                                Toast.makeText(LoginActivity.this,Strings.LOGIN_Fail,Toast.LENGTH_SHORT).show();
-//                            }
-//
-//
-//                        }
-//                    });
-//
-//                }
+//                startActivity(new Intent(LoginActivity.this,MainActivity.class));
+                String username=et_username.getText().toString().trim();
+                String password=et_password.getText().toString().trim();
+                //用户名或密码为空
+                if (TextUtils.isEmpty(username)||TextUtils.isEmpty(password)){
+                    Toast.makeText(LoginActivity.this, Strings.LOGIN_NULL,Toast.LENGTH_SHORT).show();
+                }else{
+                    //用户登录
+                    OkHttpUtils
+                            .post()
+                            .url(Strings.REQUEST_URL+"login")
+                            .addParams("userName",username)
+                            .addParams("password",password)
+                            .build()
+                            .execute(new StringCallback() {
+                        @Override
+                        public void onError(Call call, Exception e) {
+                            Toast.makeText(LoginActivity.this,Strings.LOGIN_Fail,Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onResponse(String response) {
+                            Map<String,List<UserBean>> map= JasonUtils.getUserJson(response);
+                            if (map!=null){
+                                Set set=map.keySet();
+                                Iterator iter = set.iterator();
+                                while (iter.hasNext()) {
+                                    String key = (String) iter.next();
+                                    if (key!=null&&key.equals("0")){
+                                        startActivity(new Intent(LoginActivity.this,MainActivity.class));
+                                    }else{
+                                        Toast.makeText(LoginActivity.this,Strings.LOGIN_Fail,Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            }else{
+                                Toast.makeText(LoginActivity.this,Strings.LOGIN_Fail,Toast.LENGTH_SHORT).show();
+                            }
+
+
+                        }
+                    });
+
+                }
 
                 break;
         }
