@@ -1,8 +1,6 @@
 package com.bj.yt.newapplication.fragment;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,7 +21,7 @@ import com.bj.yt.newapplication.util.ToastUtil;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-public class MessageFragment extends BaseFragment implements View.OnClickListener {
+public class MessageFragment extends BaseFragment implements View.OnClickListener{
     private String TAG="MessageFragment";
     private View view;
     private TextView title_center;
@@ -31,28 +29,6 @@ public class MessageFragment extends BaseFragment implements View.OnClickListene
     private ChatMsgViewAdapter chatMsgViewAdapter;
     private Button btn_send;
     private EditText sendmsg_edit;
-//    Handler handler=new Handler(){
-//        @Override
-//        public void handleMessage(Message msg) {
-//            super.handleMessage(msg);
-//            switch (msg.what){
-//                //自己发送数据跟新
-//                case 1:
-//                    chatMsgViewAdapter.notifyDataSetChanged();
-//                    msglist.setSelection(msglist.getCount() - 1);
-//                    ToastUtil.showToast(getActivity(),MyApplication.newsList.get(MyApplication.newsList.size()-1).getContext());
-//                    ToastUtil.showToast(getActivity(),MyApplication.newsList.size()+"");
-//                    break;
-//                //后台接收的数据
-//                case 2:
-//                    chatMsgViewAdapter.notifyDataSetChanged();
-//                    msglist.setSelection(msglist.getCount() - 1);
-//                    ToastUtil.showToast(getActivity(),MyApplication.newsList.get(MyApplication.newsList.size()-1).getContext());
-//                    ToastUtil.showToast(getActivity(),MyApplication.newsList.size()+"");
-//                    break;
-//            }
-//        }
-//    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -62,35 +38,39 @@ public class MessageFragment extends BaseFragment implements View.OnClickListene
         return view;
     }
 
-    public void updateDate(){
-        chatMsgViewAdapter.notifyDataSetChanged();
-        msglist.setSelection(msglist.getCount() - 1);
-        ToastUtil.showToast(getActivity(),MyApplication.newsList.get(MyApplication.newsList.size()-1).getContext());
-        ToastUtil.showToast(getActivity(),MyApplication.newsList.size()+"");
-    }
-
-    @Subscribe
-    public void onEventMainThread(MessageEvent event){
-        Log.i(TAG,"消息有更新");
-        if(event.message.toString().equals("newmessage")){
-//            Message message=new Message();
-//            message.what=2;
-//            handler.sendMessage(message);
-            updateDate();
-        }
-    }
-
     private void initView() {
         title_center= (TextView)view.findViewById(R.id.title_center);
         title_center.setText("消息");
         msglist= (ListView) view.findViewById(R.id.msglist);
         btn_send= (Button) view.findViewById(R.id.btn_send);
         btn_send.setOnClickListener(this);
-        sendmsg_edit= (EditText) view.findViewById(R.id.sendmsg_edit);
         chatMsgViewAdapter =new ChatMsgViewAdapter(getActivity(), MyApplication.newsList);
         msglist.setAdapter(chatMsgViewAdapter);
         msglist.setSelection(msglist.getCount() - 1);//数据移动到最后一行
-}
+        sendmsg_edit= (EditText) view.findViewById(R.id.sendmsg_edit);
+    }
+
+    /**
+     * 接收消息跟新发过来的广播
+     * @param event
+     */
+    @Subscribe
+    public void onEventMainThread(MessageEvent event){
+        Log.i(TAG,"消息有更新");
+        if(event.message.toString().equals("newmessage")){
+            updateDate();
+        }
+    }
+
+    /**
+     * 更新消息
+     */
+    public void updateDate(){
+        chatMsgViewAdapter.notifyDataSetChanged();
+        msglist.setSelection(msglist.getCount() - 1);
+        ToastUtil.showToast(getActivity(),MyApplication.newsList.get(MyApplication.newsList.size()-1).getContext());
+        ToastUtil.showToast(getActivity(),MyApplication.newsList.size()+"");
+    }
 
     @Override
     public void onStart() {
@@ -108,6 +88,8 @@ public class MessageFragment extends BaseFragment implements View.OnClickListene
         }
     }
 
+
+
     @Override
     public void onClick(View view) {
         switch (view.getId()){
@@ -122,19 +104,17 @@ public class MessageFragment extends BaseFragment implements View.OnClickListene
         }
     }
 
+    /**
+     * 自己发送消息处理
+     * @param msg
+     */
     private void sendMessage(String msg) {
         NewsBean newsBean=new NewsBean();
         newsBean.setSubmitTime(Dateutil.getStrDate());
         newsBean.setContext(msg);
         newsBean.setIsme(true);
         MyApplication.newsList.add(newsBean);
-
-//        Message message=new Message();
-//        message.what=1;
-//        handler.sendMessage(message);
-
         updateDate();
-
         sendmsg_edit.setText("");
     }
 }
