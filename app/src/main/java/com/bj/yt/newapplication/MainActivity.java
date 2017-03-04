@@ -18,13 +18,16 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bj.yt.newapplication.common.MyApplication;
 import com.bj.yt.newapplication.fragment.LocationFragment;
 import com.bj.yt.newapplication.fragment.MessageFragment;
 import com.bj.yt.newapplication.fragment.ThreeDFragment;
 import com.bj.yt.newapplication.receiver.LocationReceiver;
 import com.bj.yt.newapplication.receiver.MessageReceiver;
+import com.bj.yt.newapplication.util.Netutil;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
+    private String TAG="MainActivity";
     // 定义Fragment对象
     private LocationFragment locationFragment;
     private MessageFragment messageFragment;
@@ -47,88 +50,36 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //判断网络是否连接
-        checkNetworkState();
-        //判断是否已登录
-        SharedPreferences sharedPreferences=getSharedPreferences("info",MODE_PRIVATE);
-        if (sharedPreferences==null){
-            startActivity(new Intent(MainActivity.this,LoginActivity.class));
-        }
-        String un=sharedPreferences.getString("userNaeme","");
-        String pw=sharedPreferences.getString("password","");
-                Log.i("<<取得的用户名密码<<",un+","+pw);
 
         fragmentManager = getSupportFragmentManager();
         initView(); // 初始化界面控件
         setChioceItem(0);   // 初始化页面加载时显示第一个选项卡
 
-        startLocationAlarmManager();
-        startMsgAlarmManager();
-    }
-
-
-    /**
-     * 判断网络是否连接
-     */
-    private void checkNetworkState() {
-
-        //得到网络连接信息
-        ConnectivityManager con=(ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-        //判断网络是否连接
-
-        if (con.getActiveNetworkInfo()==null||!con.getActiveNetworkInfo().isAvailable()){
-            Log.i("<<<<<","进入alert设置");
-            AlertDialog.Builder alert=new AlertDialog.Builder(this);
-            alert.setTitle("提示");
-            alert.setMessage("当前无网络");
-            alert.setCancelable(false);
-            alert.setPositiveButton("设置", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    startActivity(new Intent(android.provider.Settings.ACTION_WIFI_SETTINGS));
+        /**   <-----是否第一次今入主界面----->
+         * 判断是否有网络
+         * 有，判断是否登录
+         *      登录  继续
+         *      没有登录  跳转到登录界面
+         * 没有，弹出设置网络框
+         */
+        if(MyApplication.isFirstMain){
+            if(Netutil.isNetworkAvailable(this)){
+                if(isLogin()){
+                    startLocationAlarmManager();//开启定位
+                    startMsgAlarmManager();//开启检查消息
+                }else{
+                    startActivity(new Intent(MainActivity.this,LoginActivity.class));
+                    MyApplication.isFirstMain=false;
                 }
-            });
-            alert.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    finish();
-                }
-            });
-            alert.create();
-            alert.show();
+            }else{
+                showNetAlert();
+            }
         }
     }
-
-    private void startLocationAlarmManager() {
-        Intent intent =new Intent(MainActivity.this, LocationReceiver.class);
-        intent.setAction("sendLocation");
-        PendingIntent sender=PendingIntent.getBroadcast(MainActivity.this, 0, intent, 0);
-        //开始时间
-        long firstime=SystemClock.elapsedRealtime();
-
-        AlarmManager am=(AlarmManager)getSystemService(ALARM_SERVICE);
-        //5秒一个周期，不停的发送广播
-        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstime, 10*1000, sender);
-    }
-
-    private void startMsgAlarmManager() {
-        Intent intent =new Intent(MainActivity.this, MessageReceiver.class);
-        intent.setAction("isNewMessage");
-        PendingIntent sender=PendingIntent.getBroadcast(MainActivity.this, 0, intent, 0);
-        //开始时间
-        long firstime=SystemClock.elapsedRealtime();
-
-        AlarmManager am=(AlarmManager)getSystemService(ALARM_SERVICE);
-        //5秒一个周期，不停的发送广播
-        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstime, 10*1000, sender);
-    }
-
-
     /**
      * 初始化页面
      */
     private void initView() {
-
         // 初始化底部导航栏的控件
         location_text = (TextView) findViewById(R.id.location_text);
         message_text = (TextView) findViewById(R.id.message_text);
@@ -141,6 +92,76 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         location_layout.setOnClickListener(this);
         message_layout.setOnClickListener(this);
         threed_layout.setOnClickListener(this);
+    }
+
+
+    /**
+     * 是否登录
+     * @return
+     */
+    public boolean isLogin(){
+        SharedPreferences sharedPreferences=getSharedPreferences("info",MODE_PRIVATE);
+        String username=sharedPreferences.getString("userNaeme","");
+        if("".equals(username)){
+            return false;
+        }
+        MyApplication.useraccount=username;
+        return true;
+    }
+
+    /**
+     * 网络设置对话框
+     */
+    private void showNetAlert() {
+        Log.i("TAG","进入alert设置");
+        AlertDialog.Builder alert=new AlertDialog.Builder(this);
+        alert.setTitle("提示");
+        alert.setMessage("当前无网络，是否设置网络？");
+        alert.setCancelable(false);
+        alert.setPositiveButton("设置", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                startActivity(new Intent(android.provider.Settings.ACTION_WIFI_SETTINGS));
+            }
+        });
+        alert.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                finish();
+            }
+        });
+        alert.create();
+        alert.show();
+    }
+
+    /**
+     * 发送定位周期广播
+     */
+    private void startLocationAlarmManager() {
+        Intent intent =new Intent(MainActivity.this, LocationReceiver.class);
+        intent.setAction("sendLocation");
+        PendingIntent sender=PendingIntent.getBroadcast(MainActivity.this, 0, intent, 0);
+        //开始时间
+        long firstime=SystemClock.elapsedRealtime();
+
+        AlarmManager am=(AlarmManager)getSystemService(ALARM_SERVICE);
+        //5秒一个周期，不停的发送广播
+        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstime, 10*1000, sender);
+    }
+
+    /**
+     * 发送检查消息更新周期广播
+     */
+    private void startMsgAlarmManager() {
+        Intent intent =new Intent(MainActivity.this, MessageReceiver.class);
+        intent.setAction("isNewMessage");
+        PendingIntent sender=PendingIntent.getBroadcast(MainActivity.this, 0, intent, 0);
+        //开始时间
+        long firstime=SystemClock.elapsedRealtime();
+
+        AlarmManager am=(AlarmManager)getSystemService(ALARM_SERVICE);
+        //5秒一个周期，不停的发送广播
+        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstime, 10*1000, sender);
     }
 
     @Override

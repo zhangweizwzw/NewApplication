@@ -1,6 +1,6 @@
 package com.bj.yt.newapplication.utils;
 
-import com.bj.yt.newapplication.config.UserBean;
+import com.bj.yt.newapplication.bean.UserBean;
 
 import org.json.JSONArray;
 import org.json.JSONException;

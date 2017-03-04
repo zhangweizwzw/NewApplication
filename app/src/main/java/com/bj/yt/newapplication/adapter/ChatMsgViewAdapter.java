@@ -8,7 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.bj.yt.newapplication.R;
-import com.bj.yt.newapplication.config.NewsBean;
+import com.bj.yt.newapplication.bean.NewsBean;
 
 import java.util.List;
 

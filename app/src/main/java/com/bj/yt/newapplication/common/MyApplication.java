@@ -2,7 +2,7 @@ package com.bj.yt.newapplication.common;
 
 import android.app.Application;
 
-import com.bj.yt.newapplication.config.NewsBean;
+import com.bj.yt.newapplication.bean.NewsBean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +20,8 @@ public class MyApplication extends Application{
     public static double newlon;
     //用户账号
     public static String useraccount="0";
+    //是否第一次进入主界面
+    public static boolean isFirstMain=true;
 
     @Override
     public void onCreate() {

@@ -1,7 +1,5 @@
 package com.bj.yt.newapplication;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -13,24 +11,29 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bj.yt.newapplication.bean.LoginBean;
+import com.bj.yt.newapplication.bean.NewsBean;
+import com.bj.yt.newapplication.common.MyApplication;
+import com.bj.yt.newapplication.config.MessageEvent;
 import com.bj.yt.newapplication.config.Strings;
-import com.bj.yt.newapplication.config.UserBean;
-import com.bj.yt.newapplication.utils.JasonUtils;
+import com.google.gson.Gson;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
-import java.util.HashMap;
-import java.util.Iterator;
+import org.greenrobot.eventbus.EventBus;
+
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import okhttp3.Call;
 
+
 public class LoginActivity extends BaseActivity implements View.OnClickListener {
+    private String TAG="LoginActivity";
     private Button btn_reset,btn_login;
     private TextView title_center;
     private EditText et_username,et_password;
+    private List<NewsBean> newsList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +53,26 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
         title_center= (TextView) findViewById(R.id.title_center);
         title_center.setText("登录");
+
+          //假数据测试
+//        String username="0";
+//        String str="{\"id\":\"0\",\"list\":[{\"id\":7,\"submitTime\":\"2017-03-02T03:18:23.152+0000\",\"sendTime\":null,\"submitUserId\":5,\"acceptUserId\":0,\"context\":\"15\"},{\"id\":8,\"submitTime\":\"2017-03-02T03:18:23.152+0000\",\"sendTime\":null,\"submitUserId\":55,\"acceptUserId\":0,\"context\":\"4654\"},{\"id\":5,\"submitTime\":\"2017-03-02T03:18:23.152+0000\",\"sendTime\":null,\"submitUserId\":5,\"acceptUserId\":0,\"context\":\"c\"}]}";
+//        LoginBean lbean=new LoginBean();
+//        Gson gson=new Gson();
+//        lbean=gson.fromJson(str,LoginBean.class);
+//        if("0".equals(lbean.getId())){
+//            SharedPreferences share=getSharedPreferences("info",MODE_PRIVATE);
+//            MyApplication.useraccount=username;//保存用户名
+//            share.edit().putString("userName",username).putString("password","123456").commit();
+//
+//            newsList=new ArrayList<NewsBean>();
+//            newsList=lbean.getList();
+//            MyApplication.newsList.addAll(newsList);
+//            Log.i(TAG,"有消息");
+//            EventBus.getDefault().post(new MessageEvent("loginNewmessage"));//通知消息页面更新
+//
+//            startActivity(new Intent(LoginActivity.this,MainActivity.class));
+//            finish();
     }
 
     @Override
@@ -82,27 +105,27 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
                         @Override
                         public void onResponse(String response) {
-                            Map<String,List<UserBean>> map= JasonUtils.getUserJson(response);
-                            if (map!=null){
-                                Log.i("<<<<<",map+"");
-                                Set set=map.keySet();
-                                Iterator iter = set.iterator();
-                                while (iter.hasNext()) {
-                                    String key = (String) iter.next();
-                                    if (key!=null&&key.equals("0")){
-                                        //保存用户名和密码
-                                        SharedPreferences share=getSharedPreferences("info",MODE_PRIVATE);
-                                        share.edit().putString("userName",username).putString("password",password).commit();
-                                        startActivity(new Intent(LoginActivity.this,MainActivity.class));
-                                        finish();
-                                    }else{
-                                        Toast.makeText(LoginActivity.this,Strings.LOGIN_Fail,Toast.LENGTH_SHORT).show();
-                                    }
-                                }
+                            LoginBean lbean=new LoginBean();
+                            Gson gson=new Gson();
+                            lbean=gson.fromJson(response,LoginBean.class);
+                            if("0".equals(lbean.getId())) {
+                                SharedPreferences share = getSharedPreferences("info", MODE_PRIVATE);
+                                share.edit().putString("userName", username).putString("password", password).commit();
+                                MyApplication.useraccount = username;//保存用户名
+
+                                //通知消息集合并页面更新
+                                newsList = new ArrayList<NewsBean>();
+                                newsList = lbean.getList();
+                                MyApplication.newsList.addAll(newsList);
+                                Log.i(TAG, "有消息");
+                                EventBus.getDefault().post(new MessageEvent("loginNewmessage"));
+
+                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                finish();
+
                             }else{
                                 Toast.makeText(LoginActivity.this,Strings.LOGIN_Fail,Toast.LENGTH_SHORT).show();
                             }
-
                         }
                     });
 

@@ -14,7 +14,7 @@ import com.bj.yt.newapplication.R;
 import com.bj.yt.newapplication.adapter.ChatMsgViewAdapter;
 import com.bj.yt.newapplication.common.MyApplication;
 import com.bj.yt.newapplication.config.MessageEvent;
-import com.bj.yt.newapplication.config.NewsBean;
+import com.bj.yt.newapplication.bean.NewsBean;
 import com.bj.yt.newapplication.util.Dateutil;
 import com.bj.yt.newapplication.util.ToastUtil;
 
@@ -56,8 +56,11 @@ public class MessageFragment extends BaseFragment implements View.OnClickListene
      */
     @Subscribe
     public void onEventMainThread(MessageEvent event){
-        Log.i(TAG,"消息有更新");
         if(event.message.toString().equals("newmessage")){
+            Log.i(TAG,"查询消息有更新");
+            updateDate();
+        }else if(event.message.toString().equals("loginNewmessage")){
+            Log.i(TAG,"登录界面消息更新");
             updateDate();
         }
     }

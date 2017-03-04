@@ -3,6 +3,7 @@ package com.bj.yt.newapplication.fragment;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import com.bj.yt.newapplication.R;
 import com.bj.yt.newapplication.common.MyApplication;
 import com.bj.yt.newapplication.config.MessageEvent;
+import com.bj.yt.newapplication.util.GpsUtil;
 import com.bj.yt.newapplication.util.Locationutil;
 import com.esri.android.map.GraphicsLayer;
 import com.esri.android.map.LocationDisplayManager;
@@ -48,10 +50,13 @@ public class LocationFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_location, container, false);
 
-        //获取经纬度信息
-        Locationutil.goLocation(getActivity());
-
         initView();
+        if(GpsUtil.hasGPSDevice(getActivity())){
+            initData();
+        }else{
+            //获取经纬度
+            Locationutil.goLocation(getActivity());
+        }
         return view;
     }
 
@@ -100,7 +105,7 @@ public class LocationFragment extends BaseFragment {
                     ldm.setAutoPanMode(LocationDisplayManager.AutoPanMode.LOCATION);
                     ldm.start();
                     //移动到当前位置
-                    System.out.println("llllllllll:"+MyApplication.newlon);
+                    Log.i(TAG,"");
                     ShowLocation(MyApplication.newlon,MyApplication.newlat);
                 }
             }
@@ -139,17 +144,17 @@ public class LocationFragment extends BaseFragment {
         }
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        map.pause();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        map.unpause();
-    }
+//    @Override
+//    public void onPause() {
+//        super.onPause();
+//        map.pause();
+//    }
+//
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        map.unpause();
+//    }
 
     @Override
     public void onDestroy() {

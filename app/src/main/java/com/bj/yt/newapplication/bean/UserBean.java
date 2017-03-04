@@ -1,35 +1,37 @@
-package com.bj.yt.newapplication.config;
+package com.bj.yt.newapplication.bean;
 
 /**
- * Created by admin on 2017/3/2.
+ * Created by wxixis on 2017/3/2.
  */
 
-public class NewsBean {
-
+public class UserBean {
     /**
-     * id : 3
-     * submitTime : 2017-03-02T09:05:56.331+0000
-     * sendTime : null
-     * submitUserId : 3
-     * acceptUserId : 0
-     * context : a
+     * {"id":"0",
+     * "list":[
+     * {"id":7,
+     * "submitTime":"2017-03-02T03:18:23.152+0000",
+     * "sendTime":null,
+     * "submitUserId":5,
+     * "acceptUserId":0,
+     * "context":"15"},
+     * {"id":8,"submitTime":"2017-03-02T03:18:23.152+0000",
+     * "sendTime":null,
+     * "submitUserId":55,
+     * "acceptUserId":0,"context":"4654"},
+     * {"id":5,"submitTime":"2017-03-02T03:18:23.152+0000",
+     * "sendTime":null,
+     * "submitUserId":5,
+     * "acceptUserId":0,
+     * "context":"c"}
+     * ]
+     * }
      */
-
     private int id;
     private String submitTime;
-    private Object sendTime;
+    private String sendTime;
     private int submitUserId;
     private int acceptUserId;
     private String context;
-    private boolean isme;
-
-    public boolean getIsme() {
-        return isme;
-    }
-
-    public void setIsme(boolean isme) {
-        this.isme = isme;
-    }
 
     public int getId() {
         return id;
@@ -47,11 +49,11 @@ public class NewsBean {
         this.submitTime = submitTime;
     }
 
-    public Object getSendTime() {
+    public String getSendTime() {
         return sendTime;
     }
 
-    public void setSendTime(Object sendTime) {
+    public void setSendTime(String sendTime) {
         this.sendTime = sendTime;
     }
 
