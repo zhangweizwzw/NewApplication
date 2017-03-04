@@ -65,19 +65,16 @@ public class ChatMsgViewAdapter extends BaseAdapter {
                 convertView = mInflater.inflate(R.layout.chatting_item_msg_text_left, null);
             }
             viewHolder = new ViewHolder();
-            viewHolder.tvSendTime = (TextView) convertView
-                    .findViewById(R.id.tv_sendtime);
-            viewHolder.tvUserName = (TextView) convertView
-                    .findViewById(R.id.tv_username);
-            viewHolder.tvContent = (TextView) convertView
-                    .findViewById(R.id.tv_chatcontent);
+            viewHolder.tvSendTime = (TextView) convertView.findViewById(R.id.tv_sendtime);
+            viewHolder.tvUserName = (TextView) convertView.findViewById(R.id.tv_username);
+            viewHolder.tvContent = (TextView) convertView.findViewById(R.id.tv_chatcontent);
             viewHolder.isComMsg = isComMsg;
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
         viewHolder.tvSendTime.setText(entity.getSubmitTime());
-        viewHolder.tvUserName.setText("aaaa");
+        viewHolder.tvUserName.setText(position+"");
         viewHolder.tvContent.setText(entity.getContext());
         return convertView;
     }

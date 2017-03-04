@@ -44,7 +44,27 @@ android {
             signingConfig signingConfigs.config
         }
     }
+
+    productFlavors {
+        armv7 {
+            ndk {
+                abiFilters "armeabi-v7a", ""
+            }
+        }
+        x86 {
+            ndk {
+                abiFilters "x86", ""
+            }
+        }
+    }
 }
+
+repositories {
+    maven {
+        url 'https://download.01.org/crosswalk/releases/crosswalk/android/maven2'
+    }
+}
+
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
@@ -63,4 +83,6 @@ dependencies {
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'org.greenrobot:eventbus:3.0.0'
     compile files('libs/AMap_Location_V3.3.0_20170118.jar')
+    //指定编译的lib，应该是12.41.296.9最新稳定版的吧
+    compile 'org.xwalk:xwalk_core_library:12.41.296.9'
 }
