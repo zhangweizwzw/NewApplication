@@ -1,8 +1,11 @@
 package com.bj.yt.newapplication;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -16,6 +19,8 @@ import com.bj.yt.newapplication.bean.NewsBean;
 import com.bj.yt.newapplication.common.MyApplication;
 import com.bj.yt.newapplication.config.MessageEvent;
 import com.bj.yt.newapplication.config.Strings;
+import com.bj.yt.newapplication.receiver.LocationReceiver;
+import com.bj.yt.newapplication.receiver.MessageReceiver;
 import com.google.gson.Gson;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
@@ -75,6 +80,36 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 //            finish();
     }
 
+    /**
+     * 发送定位周期广播
+     */
+    private void startLocationAlarmManager() {
+        Intent intent =new Intent(LoginActivity.this, LocationReceiver.class);
+        intent.setAction("sendLocation");
+        PendingIntent sender=PendingIntent.getBroadcast(LoginActivity.this, 0, intent, 0);
+        //开始时间
+        long firstime= SystemClock.elapsedRealtime();
+
+        AlarmManager am=(AlarmManager)getSystemService(ALARM_SERVICE);
+        //5秒一个周期，不停的发送广播
+        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstime, 10*1000, sender);
+    }
+
+    /**
+     * 发送检查消息更新周期广播
+     */
+    private void startMsgAlarmManager() {
+        Intent intent =new Intent(LoginActivity.this, MessageReceiver.class);
+        intent.setAction("isNewMessage");
+        PendingIntent sender=PendingIntent.getBroadcast(LoginActivity.this, 0, intent, 0);
+        //开始时间
+        long firstime=SystemClock.elapsedRealtime();
+
+        AlarmManager am=(AlarmManager)getSystemService(ALARM_SERVICE);
+        //5秒一个周期，不停的发送广播
+        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstime, 10*1000, sender);
+    }
+
     @Override
     public void onClick(View view) {
         switch (view.getId()){
@@ -120,8 +155,12 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                 Log.i(TAG, "有消息");
                                 EventBus.getDefault().post(new MessageEvent("loginNewmessage"));
 
+                                startLocationAlarmManager();//开启定位
+                                startMsgAlarmManager();//开启检查消息
+
                                 startActivity(new Intent(LoginActivity.this, MainActivity.class));
                                 finish();
+
 
                             }else{
                                 Toast.makeText(LoginActivity.this,Strings.LOGIN_Fail,Toast.LENGTH_SHORT).show();

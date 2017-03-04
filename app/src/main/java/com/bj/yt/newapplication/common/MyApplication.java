@@ -20,6 +20,8 @@ public class MyApplication extends Application{
     public static double newlon;
     //用户账号
     public static String useraccount="0";
+    //用户密码
+    public static String password="";
     //是否第一次进入主界面
     public static boolean isFirstMain=true;
 

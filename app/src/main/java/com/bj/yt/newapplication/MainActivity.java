@@ -17,14 +17,29 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bj.yt.newapplication.bean.LoginBean;
+import com.bj.yt.newapplication.bean.NewsBean;
 import com.bj.yt.newapplication.common.MyApplication;
+import com.bj.yt.newapplication.config.MessageEvent;
+import com.bj.yt.newapplication.config.Strings;
 import com.bj.yt.newapplication.fragment.LocationFragment;
 import com.bj.yt.newapplication.fragment.MessageFragment;
 import com.bj.yt.newapplication.fragment.ThreeDFragment;
 import com.bj.yt.newapplication.receiver.LocationReceiver;
 import com.bj.yt.newapplication.receiver.MessageReceiver;
 import com.bj.yt.newapplication.util.Netutil;
+import com.google.gson.Gson;
+import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.callback.StringCallback;
+
+import org.greenrobot.eventbus.EventBus;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import okhttp3.Call;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
     private String TAG="MainActivity";
@@ -45,6 +60,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private TextView threed_text;
     // 定义FragmentManager对象管理器
     private FragmentManager fragmentManager;
+    private List<NewsBean> newsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,25 +71,18 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         initView(); // 初始化界面控件
         setChioceItem(0);   // 初始化页面加载时显示第一个选项卡
 
-        /**   <-----是否第一次今入主界面----->
+        /**
+         * 是否第一次今入主界面
          * 判断是否有网络
-         * 有，判断是否登录
-         *      登录  继续
-         *      没有登录  跳转到登录界面
          * 没有，弹出设置网络框
          */
         if(MyApplication.isFirstMain){
             if(Netutil.isNetworkAvailable(this)){
-                if(isLogin()){
-                    startLocationAlarmManager();//开启定位
-                    startMsgAlarmManager();//开启检查消息
-                }else{
-                    startActivity(new Intent(MainActivity.this,LoginActivity.class));
-                    MyApplication.isFirstMain=false;
-                }
+                checkIsLogin();
             }else{
                 showNetAlert();
             }
+            MyApplication.isFirstMain=false;
         }
     }
     /**
@@ -99,14 +108,23 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
      * 是否登录
      * @return
      */
-    public boolean isLogin(){
+    public void checkIsLogin(){
         SharedPreferences sharedPreferences=getSharedPreferences("info",MODE_PRIVATE);
         String username=sharedPreferences.getString("userNaeme","");
+        String password=sharedPreferences.getString("password","");
         if("".equals(username)){
-            return false;
+            startActivity(new Intent(MainActivity.this,LoginActivity.class));
+            MyApplication.isFirstMain=false;
+        }else{
+            //获取登录界面返回的消息
+            MyApplication.useraccount=username;
+            MyApplication.password=password;
+            getLoginMsg();
+
+            startLocationAlarmManager();//开启定位
+            startMsgAlarmManager();//开启检查消息
         }
-        MyApplication.useraccount=username;
-        return true;
+
     }
 
     /**
@@ -121,7 +139,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         alert.setPositiveButton("设置", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                startActivity(new Intent(android.provider.Settings.ACTION_WIFI_SETTINGS));
+                startActivityForResult(new Intent(android.provider.Settings.ACTION_WIFI_SETTINGS), 1);
             }
         });
         alert.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -132,6 +150,20 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         });
         alert.create();
         alert.show();
+    }
+
+    /**
+     * 设置完网络返回继续判断是否登录
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==1){
+            checkIsLogin();
+        }
     }
 
     /**
@@ -192,7 +224,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         switch (index) {
             case 0:
-//              location_text.setTextColor(dark);
                 location_layout.setBackgroundColor(getResources().getColor(R.color.table_color));
                 // 如果fragment为空，则创建一个并添加到界面上
                 if (locationFragment == null) {
@@ -204,7 +235,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 }
                 break;
             case 1:
-//              message_text.setTextColor(dark);
                 message_layout.setBackgroundColor(getResources().getColor(R.color.table_color));
                 if (messageFragment == null) {
                     messageFragment = new MessageFragment();
@@ -214,7 +244,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 }
                 break;
             case 2:
-//              threed_text.setTextColor(dark);
                 threed_layout.setBackgroundColor(getResources().getColor(R.color.table_color));
                 if (threeDFragment == null) {
                     threeDFragment = new ThreeDFragment();
@@ -232,13 +261,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
      */
     private void clearChioce() {
         //位置
-//      location_text.setTextColor(getResources().getColor(R.color.black));
         location_layout.setBackgroundColor(getResources().getColor(R.color.white));
         //消息
-//      message_text.setTextColor(getResources().getColor(R.color.black));
         message_layout.setBackgroundColor(getResources().getColor(R.color.white));
         //3D展示
-//      threed_text.setTextColor(getResources().getColor(R.color.black));
         threed_layout.setBackgroundColor(getResources().getColor(R.color.white));
     }
     /**
@@ -256,4 +282,44 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             fragmentTransaction.hide(threeDFragment);
         }
     }
+
+    /**
+     * 获取登录界面返回的消息
+     */
+    private void getLoginMsg() {
+
+        //用户登录
+        OkHttpUtils
+            .post()
+            .url(Strings.REQUEST_URL+"login")
+            .addParams("userName",MyApplication.useraccount)
+            .addParams("password",MyApplication.password)
+            .build()
+            .execute(new StringCallback() {
+                @Override
+                public void onError(Call call, Exception e) {
+                    Toast.makeText(MainActivity.this,Strings.LOGIN_Fail,Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onResponse(String response) {
+                    LoginBean lbean=new LoginBean();
+                    Gson gson=new Gson();
+                    lbean=gson.fromJson(response,LoginBean.class);
+                    if("0".equals(lbean.getId())) {
+                        //通知消息集合并页面更新
+                        newsList = new ArrayList<NewsBean>();
+                        newsList = lbean.getList();
+                        MyApplication.newsList.addAll(newsList);
+                        Log.i(TAG, "有消息");
+                        EventBus.getDefault().post(new MessageEvent("loginNewmessage"));
+
+                        startActivity(new Intent(MainActivity.this, MainActivity.class));
+                        finish();
+                    }
+                }
+            });
+
+        }
+
 }
