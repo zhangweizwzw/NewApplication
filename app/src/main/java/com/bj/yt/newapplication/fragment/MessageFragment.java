@@ -15,11 +15,22 @@ import com.bj.yt.newapplication.adapter.ChatMsgViewAdapter;
 import com.bj.yt.newapplication.common.MyApplication;
 import com.bj.yt.newapplication.config.MessageEvent;
 import com.bj.yt.newapplication.bean.NewsBean;
+import com.bj.yt.newapplication.config.Strings;
 import com.bj.yt.newapplication.util.Dateutil;
 import com.bj.yt.newapplication.util.ToastUtil;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.callback.StringCallback;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+
+import okhttp3.Call;
 
 public class MessageFragment extends BaseFragment implements View.OnClickListener{
     private String TAG="MessageFragment";
@@ -71,8 +82,6 @@ public class MessageFragment extends BaseFragment implements View.OnClickListene
     public void updateDate(){
         chatMsgViewAdapter.notifyDataSetChanged();
         msglist.setSelection(msglist.getCount() - 1);
-        ToastUtil.showToast(getActivity(),MyApplication.newsList.get(MyApplication.newsList.size()-1).getContext());
-        ToastUtil.showToast(getActivity(),MyApplication.newsList.size()+"");
     }
 
     @Override
@@ -102,9 +111,29 @@ public class MessageFragment extends BaseFragment implements View.OnClickListene
                     ToastUtil.showToast(getActivity(),"发送信息不能为空！");
                 }else{
                     sendMessage(msgstr);
+                    sendMessageToNet(msgstr);
                 }
                 break;
         }
+    }
+
+    private void sendMessageToNet(String strmsg) {
+        OkHttpUtils.post().url(Strings.REQUEST_URL+"acceptNews")
+                .addParams("submitId",MyApplication.id)
+                .addParams("username",MyApplication.username)
+                .addParams("context",strmsg)
+                .build().execute(new StringCallback() {
+            @Override
+            public void onError(Call call, Exception e) {
+
+            }
+
+            @Override
+            public void onResponse(String response) {
+               Log.i(TAG,"发送消息发挥结果："+response);
+            }
+        });
+
     }
 
     /**
@@ -120,4 +149,6 @@ public class MessageFragment extends BaseFragment implements View.OnClickListene
         updateDate();
         sendmsg_edit.setText("");
     }
+    
+    
 }

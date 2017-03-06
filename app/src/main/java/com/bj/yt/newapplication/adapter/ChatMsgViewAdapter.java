@@ -32,7 +32,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
         return coll.size();
     }
     public Object getItem(int position) {
-        return coll.get(position);
+        return coll.get(position+1);
     }
     public long getItemId(int position) {
         return position;
@@ -74,7 +74,7 @@ public class ChatMsgViewAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
         viewHolder.tvSendTime.setText(entity.getSubmitTime());
-        viewHolder.tvUserName.setText(position+"");
+        viewHolder.tvUserName.setText(position+1);
         viewHolder.tvContent.setText(entity.getContext());
         return convertView;
     }

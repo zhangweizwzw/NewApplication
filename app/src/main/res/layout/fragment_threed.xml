@@ -6,9 +6,14 @@
     <include android:id="@+id/title_bar"
         layout="@layout/title_bar"/>
 
-    <WebView android:id="@+id/web_threed"
+    <org.xwalk.core.XWalkView android:id="@+id/xwalk"
+        android:layout_below="@+id/title_bar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </org.xwalk.core.XWalkView>
+    <!--<WebView android:id="@+id/web_threed"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/title_bar"/>
+        android:layout_below="@+id/title_bar"/>-->
 
 </RelativeLayout>

@@ -21,17 +21,19 @@ import android.widget.TextView;
 
 import com.bj.yt.newapplication.R;
 
+import org.xwalk.core.XWalkPreferences;
 import org.xwalk.core.XWalkView;
 
 public class ThreeDFragment extends BaseFragment {
     private  View view;
-    private WebView webView;
+//    private WebView webView;
     private WebSettings mWebSettings;
     private TextView title_center;
+    private XWalkView xwalk;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-//        view = inflater.inflate(R.layout.fragment_threed, container, false);
+        view = inflater.inflate(R.layout.fragment_threed, container, false);
 
 //        setUpViews();
         loadWeb();
@@ -39,11 +41,25 @@ public class ThreeDFragment extends BaseFragment {
     }
 
     private void loadWeb() {
-//        title_center= (TextView)view.findViewById(R.id.title_center);
-//        title_center.setText("3D展示");
+        title_center= (TextView)view.findViewById(R.id.title_center);
+        title_center.setText("3D展示");
+        xwalk= (XWalkView) view.findViewById(R.id.xwalk);
 
-        XWalkView xWalkView = new XWalkView(getActivity(),getActivity());
-        xWalkView.load("https://baidu.com",null);
+        //添加对javascript支持
+        XWalkPreferences.setValue("enable-javascript", true);
+        //开启调式,支持谷歌浏览器调式
+        XWalkPreferences.setValue(XWalkPreferences.REMOTE_DEBUGGING, true);
+        //置是否允许通过file url加载的Javascript可以访问其他的源,包括其他的文件和http,https等其他的源
+        XWalkPreferences.setValue(XWalkPreferences.ALLOW_UNIVERSAL_ACCESS_FROM_FILE, true);
+        //JAVASCRIPT_CAN_OPEN_WINDOW
+        XWalkPreferences.setValue(XWalkPreferences.JAVASCRIPT_CAN_OPEN_WINDOW, true);
+        // enable multiple windows.
+        XWalkPreferences.setValue(XWalkPreferences.SUPPORT_MULTIPLE_WINDOWS, true);
+
+
+//        xwalk.load("https://baidu.com",null);
+        xwalk.load("file:///android_asset/load_remote.html",null);
+
 
     }
 //    @TargetApi(Build.VERSION_CODES.ECLAIR_MR1)

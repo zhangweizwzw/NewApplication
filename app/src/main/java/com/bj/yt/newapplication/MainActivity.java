@@ -14,6 +14,7 @@ import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -110,7 +111,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
      */
     public void checkIsLogin(){
         SharedPreferences sharedPreferences=getSharedPreferences("info",MODE_PRIVATE);
-        String username=sharedPreferences.getString("userNaeme","");
+        String username=sharedPreferences.getString("userName","");
         String password=sharedPreferences.getString("password","");
         if("".equals(username)){
             startActivity(new Intent(MainActivity.this,LoginActivity.class));
@@ -178,7 +179,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         AlarmManager am=(AlarmManager)getSystemService(ALARM_SERVICE);
         //5秒一个周期，不停的发送广播
-        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstime, 10*1000, sender);
+        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstime, 30*1000, sender);
     }
 
     /**
@@ -193,7 +194,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         AlarmManager am=(AlarmManager)getSystemService(ALARM_SERVICE);
         //5秒一个周期，不停的发送广播
-        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstime, 10*1000, sender);
+        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstime, 30*1000, sender);
     }
 
     @Override
@@ -233,6 +234,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     // 如果不为空，则直接将它显示出来
                     fragmentTransaction.show(locationFragment);
                 }
+                hideRuan();
                 break;
             case 1:
                 message_layout.setBackgroundColor(getResources().getColor(R.color.table_color));
@@ -251,6 +253,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 } else {
                     fragmentTransaction.show(threeDFragment);
                 }
+                hideRuan();
                 break;
         }
         fragmentTransaction.commit();   // 提交
@@ -284,21 +287,29 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     /**
+     * 隐藏软键盘
+     */
+    public void hideRuan(){
+        InputMethodManager imm = (InputMethodManager)
+                getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(location_text.getWindowToken(), 0);
+    }
+
+    /**
      * 获取登录界面返回的消息
      */
     private void getLoginMsg() {
-
         //用户登录
         OkHttpUtils
             .post()
             .url(Strings.REQUEST_URL+"login")
-            .addParams("userName",MyApplication.useraccount)
-            .addParams("password",MyApplication.password)
+            .addParams("userName",MyApplication.id)
+            .addParams("submitId",MyApplication.username )
+            .addParams("context",MyApplication.password)
             .build()
             .execute(new StringCallback() {
                 @Override
                 public void onError(Call call, Exception e) {
-                    Toast.makeText(MainActivity.this,Strings.LOGIN_Fail,Toast.LENGTH_SHORT).show();
                 }
 
                 @Override

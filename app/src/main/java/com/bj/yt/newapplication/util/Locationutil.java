@@ -18,7 +18,7 @@ import org.greenrobot.eventbus.EventBus;
 
 public class Locationutil {
     private static final String TAG="Locationutil";
-    private static AMapLocationClient locationClient = null;
+        private static AMapLocationClient locationClient = null;
 
     public static void goLocation(Context context) {
         //初始化client
