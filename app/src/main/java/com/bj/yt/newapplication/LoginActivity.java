@@ -144,10 +144,11 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
                         @Override
                         public void onResponse(String response) {
+                            Log.i(TAG,"登录返回结果："+response );
                             LoginBean lbean=new LoginBean();
                             Gson gson=new Gson();
                              lbean=gson.fromJson(response,LoginBean.class);
-                            if("0".equals(lbean.getId())) {
+                            if("success".equals(lbean.getCode())) {
                                 SharedPreferences share = getSharedPreferences("info", MODE_PRIVATE);
                                 share.edit().putString("useraccount", useraccount)
                                 .putString("password", password)
@@ -174,7 +175,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
 
                             }else{
-                                Toast.makeText(LoginActivity.this,Strings.LOGIN_Fail,Toast.LENGTH_SHORT).show();
+                                Toast.makeText(LoginActivity.this,lbean.getCode(),Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
