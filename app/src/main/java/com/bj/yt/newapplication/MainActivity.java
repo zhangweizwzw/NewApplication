@@ -7,12 +7,15 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
+import android.os.Handler;
+import android.os.Message;
 import android.os.SystemClock;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
@@ -63,6 +66,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private FragmentManager fragmentManager;
     private List<NewsBean> newsList;
 
+    // 定义一个变量，来标识是否退出
+    private static boolean isExit = false;
+    Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            isExit = false;
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,15 +124,21 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
      */
     public void checkIsLogin(){
         SharedPreferences sharedPreferences=getSharedPreferences("info",MODE_PRIVATE);
-        String username=sharedPreferences.getString("userName","");
+        String useraccount=sharedPreferences.getString("useraccount","");
         String password=sharedPreferences.getString("password","");
-        if("".equals(username)){
+        String id=sharedPreferences.getString("id","");
+        String username=sharedPreferences.getString("username","");
+        Log.i(TAG,"获取username:"+username);
+        if("".equals(useraccount)){
             startActivity(new Intent(MainActivity.this,LoginActivity.class));
+            finish();
             MyApplication.isFirstMain=false;
         }else{
             //获取登录界面返回的消息
-            MyApplication.useraccount=username;
+            MyApplication.useraccount=useraccount;
             MyApplication.password=password;
+            MyApplication.username=username;
+            MyApplication.id=id;
             getLoginMsg();
 
             startLocationAlarmManager();//开启定位
@@ -324,13 +343,32 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         MyApplication.newsList.addAll(newsList);
                         Log.i(TAG, "有消息");
                         EventBus.getDefault().post(new MessageEvent("loginNewmessage"));
-
-                        startActivity(new Intent(MainActivity.this, MainActivity.class));
-                        finish();
                     }
                 }
             });
 
         }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            exit();
+            return false;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    private void exit() {
+        if (!isExit) {
+            isExit = true;
+            Toast.makeText(getApplicationContext(), "再按一次退出程序",
+                    Toast.LENGTH_SHORT).show();
+            // 利用handler延迟发送更改状态信息
+            mHandler.sendEmptyMessageDelayed(0, 2000);
+        } else {
+            finish();
+            System.exit(0);
+        }
+    }
 
 }

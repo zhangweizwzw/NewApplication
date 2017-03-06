@@ -40,12 +40,12 @@ public class LocationReceiver extends BroadcastReceiver {
         if(intent.getAction().equals("sendLocation")){
             Log.i(TAG,"定位定时器：30秒钟");
             //获取经纬度
-            if (GpsUtil.hasGPSDevice(context)) {
-//                getGPSConfi(context);
-                gpsLocation(context);
-            } else {
+//            if (GpsUtil.hasGPSDevice(context)) {
+////                getGPSConfi(context);
+//                gpsLocation(context);
+//            } else {
                 Locationutil.goLocation(context);
-            }
+//            }
 
             if(0.0!=MyApplication.newlat){
                 sendLocation(MyApplication.newlat,MyApplication.newlon);

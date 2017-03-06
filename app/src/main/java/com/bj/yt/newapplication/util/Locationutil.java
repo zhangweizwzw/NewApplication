@@ -7,6 +7,7 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
+import com.bj.yt.newapplication.bean.GpsBean;
 import com.bj.yt.newapplication.common.MyApplication;
 import com.bj.yt.newapplication.config.MessageEvent;
 
@@ -43,9 +44,14 @@ public class Locationutil {
             if (null != loc) {
                 //解析定位结果
 //				String result = Utils.getLocationStr(loc);
-                Log.i(TAG,"222222222222222==="+loc.getLatitude());
-                MyApplication.newlat=loc.getLatitude();
-                MyApplication.newlon=loc.getLongitude();
+                Log.i(TAG,"定位纬度==="+loc.getLatitude());
+                Log.i(TAG,"定位经度==="+loc.getLongitude());
+
+                //解决偏移
+                GpsBean gpsBean= PositionUtil.gcj_To_GpsBean84(loc.getLatitude(), loc.getLongitude());
+
+                MyApplication.newlat=gpsBean.getWgLat();
+                MyApplication.newlon=gpsBean.getWgLon();
 //				tvResult.setText(result);
                 EventBus.getDefault().post(new MessageEvent("locationUpdate"));
             }

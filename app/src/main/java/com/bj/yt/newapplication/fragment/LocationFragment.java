@@ -13,6 +13,7 @@ import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
 import com.bj.yt.newapplication.R;
 import com.bj.yt.newapplication.bean.GpsBean;
+import com.bj.yt.newapplication.common.MyApplication;
 import com.bj.yt.newapplication.util.GpsUtil;
 import com.bj.yt.newapplication.util.PositionUtil;
 import com.esri.android.map.GraphicsLayer;
@@ -39,11 +40,11 @@ public class LocationFragment extends BaseFragment {
         view = inflater.inflate(R.layout.fragment_location, container, false);
 
         initView();
-        if (GpsUtil.hasGPSDevice(getActivity())) {
-            initData();
-        } else {
+//        if (GpsUtil.hasGPSDevice(getActivity())) {
+//            initData();
+//        } else {
             goLocation();
-        }
+//        }
 
         return view;
     }
@@ -78,7 +79,8 @@ public class LocationFragment extends BaseFragment {
                     ldm.setAutoPanMode(LocationDisplayManager.AutoPanMode.LOCATION);
                     ldm.start();
                     //移动到当前位置
-                    Log.i(TAG,"有GPS的定位==》"+ldm.getLocation().getLatitude());
+                    Log.i(TAG,"有GPS的定位==》经度"+ldm.getLocation().getLatitude());
+                    Log.i(TAG,"有GPS的定位==》纬度"+ldm.getLocation().getLatitude());
                     ShowLocation(ldm.getLocation().getLongitude(), ldm.getLocation().getLatitude());
                 }
             }
@@ -136,19 +138,14 @@ public class LocationFragment extends BaseFragment {
         public void onLocationChanged(final AMapLocation loc) {
             if (null != loc) {
                 //解析定位结果
-                Log.i(TAG,"222222222222222==="+loc.getLatitude());
-
                 map.addLayer(new ArcGISTiledMapServiceLayer("http://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer"));
                 map.setOnStatusChangedListener(new OnStatusChangedListener() {
                     public void onStatusChanged(Object source, STATUS status) {
 //                        if (source == map && status == STATUS.INITIALIZED) {
 
-
-                       GpsBean gpsBean= PositionUtil.gcj_To_GpsBean84(loc.getLongitude(), loc.getLatitude());
-
-                        Log.i(TAG,"没有GPS的定位==》"+gpsBean.getWgLon());
-//                            ShowLocation(loc.getLongitude(), loc.getLatitude());
-                            ShowLocation(gpsBean.getWgLat(), gpsBean.getWgLon());
+                        Log.i(TAG,"定位纬度==="+MyApplication.newlat);
+                        Log.i(TAG,"定位经度==="+MyApplication.newlon);
+                        ShowLocation(MyApplication.newlon, MyApplication.newlat);
 //                        }
                     }
                 });
