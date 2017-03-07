@@ -72,7 +72,29 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            isExit = false;
+            switch (msg.what){
+                case 0:
+                    isExit = false;
+                    break;
+                case 1:
+                    showCon();
+                    break;
+                case 2:
+                    /**
+                     * 是否第一次今入主界面
+                     * 判断是否有网络
+                     * 没有，弹出设置网络框
+                     */
+                    if(MyApplication.isFirstMain){
+                        if(Netutil.isNetworkAvailable(MainActivity.this)){
+                            checkIsLogin();
+                        }else{
+                            showNetAlert();
+                        }
+                        MyApplication.isFirstMain=false;
+                    }
+                    break;
+            }
         }
     };
 
@@ -85,20 +107,33 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         initView(); // 初始化界面控件
         setChioceItem(0);   // 初始化页面加载时显示第一个选项卡
 
-        /**
-         * 是否第一次今入主界面
-         * 判断是否有网络
-         * 没有，弹出设置网络框
-         */
-        if(MyApplication.isFirstMain){
-            if(Netutil.isNetworkAvailable(this)){
-                checkIsLogin();
-            }else{
-                showNetAlert();
-            }
-            MyApplication.isFirstMain=false;
-        }
+        checknet();
     }
+
+    /**
+     * 判断服务器是否连接
+     */
+    private void checknet() {
+        OkHttpUtils
+                .post()
+                .url(Strings.REQUEST_URL)
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e) {
+                        Log.i(TAG, "服务器连接失败");
+
+                        mHandler.sendEmptyMessage(1);
+                    }
+
+                    @Override
+                    public void onResponse(String response) {
+                        Log.i(TAG, "服务器连接成功");
+                        mHandler.sendEmptyMessage(2);
+                    }
+                });
+    }
+
     /**
      * 初始化页面
      */
@@ -163,6 +198,25 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             }
         });
         alert.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                finish();
+            }
+        });
+        alert.create();
+        alert.show();
+    }
+
+    /**
+     * 服务器连接不上
+     */
+    private void showCon() {
+        Log.i("TAG","进入alert设置");
+        AlertDialog.Builder alert=new AlertDialog.Builder(this);
+        alert.setTitle("提示");
+        alert.setMessage("服务器错误，请检查服务器设置！");
+        alert.setCancelable(false);
+        alert.setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 finish();
