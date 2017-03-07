@@ -63,6 +63,7 @@ public class MessageReceiver extends BroadcastReceiver {
 
             @Override
             public void onResponse(String response) {
+                Log.i(TAG,"是否有新消息："+response);
                 if(response.equals("true")){
                     Log.i(TAG,"有新消息");
                     getNews();
