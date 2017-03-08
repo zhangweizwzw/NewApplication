@@ -77,22 +77,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     isExit = false;
                     break;
                 case 1:
-                    showCon();
+                    showConectionDialog();
                     break;
                 case 2:
-                    /**
-                     * 是否第一次今入主界面
-                     * 判断是否有网络
-                     * 没有，弹出设置网络框
-                     */
-                    if(MyApplication.isFirstMain){
-                        if(Netutil.isNetworkAvailable(MainActivity.this)){
-                            checkIsLogin();
-                        }else{
-                            showNetAlert();
-                        }
-                        MyApplication.isFirstMain=false;
-                    }
+                    checkIsLogin();
                     break;
             }
         }
@@ -107,13 +95,26 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         initView(); // 初始化界面控件
         setChioceItem(0);   // 初始化页面加载时显示第一个选项卡
 
-        checknet();
+        /**
+         * 是否第一次今入主界面
+         * 判断是否有网络
+         * 没有，弹出设置网络框
+         */
+        if(MyApplication.isFirstMain){
+            if(Netutil.isNetworkAvailable(MainActivity.this)){
+                checkconection();
+            }else{
+                showNetAlert();
+            }
+            MyApplication.isFirstMain=false;
+        }
+
     }
 
     /**
      * 判断服务器是否连接
      */
-    private void checknet() {
+    private void checkconection() {
         OkHttpUtils
                 .post()
                 .url(Strings.REQUEST_URL)
@@ -210,7 +211,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     /**
      * 服务器连接不上
      */
-    private void showCon() {
+    private void showConectionDialog() {
         Log.i("TAG","进入alert设置");
         AlertDialog.Builder alert=new AlertDialog.Builder(this);
         alert.setTitle("提示");
