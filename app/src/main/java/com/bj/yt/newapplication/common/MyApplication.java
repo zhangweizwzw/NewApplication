@@ -15,9 +15,9 @@ public class MyApplication extends Application{
     //用户信息集合
     public static List<NewsBean> newsList=new ArrayList<NewsBean>();
     //最新纬度
-    public static double newlat;
+    public static double newlat=0.0;
     //用户经度
-    public static double newlon;
+    public static double newlon=0.0;
     //用户账号
     public static String useraccount="";
     //用户密码
@@ -25,9 +25,9 @@ public class MyApplication extends Application{
     //是否第一次进入主界面
     public static boolean isFirstMain=true;
     //请求要用的id
-    public static String id;
+    public static String id="";
     //登录借口返回的username
-    public static String username;
+    public static String username="";
 
     @Override
     public void onCreate() {

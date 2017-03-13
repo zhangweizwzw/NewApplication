@@ -210,6 +210,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     /**
      * 服务器连接不上
+     *
      */
     private void showConectionDialog() {
         Log.i("TAG","进入alert设置");

@@ -48,11 +48,14 @@ public class Locationutil {
                 Log.i(TAG,"定位经度==="+loc.getLongitude());
 
                 //解决偏移
-                GpsBean gpsBean= PositionUtil.gcj_To_GpsBean84(loc.getLatitude(), loc.getLongitude());
+//                GpsBean gpsBean= PositionUtil.gcj_To_GpsBean84(loc.getLatitude(), loc.getLongitude());
+//
+//                MyApplication.newlat=gpsBean.getWgLat();
+//                MyApplication.newlon=gpsBean.getWgLon();
 
-                MyApplication.newlat=gpsBean.getWgLat();
-                MyApplication.newlon=gpsBean.getWgLon();
-//				tvResult.setText(result);
+                MyApplication.newlat=loc.getLatitude()-0.006517;
+                MyApplication.newlon=loc.getLongitude()-0.006198;
+
                 EventBus.getDefault().post(new MessageEvent("locationUpdate"));
             }
         }

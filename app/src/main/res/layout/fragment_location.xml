@@ -10,7 +10,7 @@
         android:id="@+id/map"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        mapoptions.ZoomLevel="17"
+        mapoptions.ZoomLevel="19"
         android:layout_below="@id/title_bar"
         mapoptions.MapType="Streets">
     </com.esri.android.map.MapView>

@@ -35,7 +35,7 @@ public class MessageReceiver extends BroadcastReceiver {
         if(intent.getAction().equals("isNewMessage")){
             Log.i(TAG,"消息定时器：30秒钟");
             //真实数据
-           initData();
+            initData();
 
 //            // 假数据
 //            nlist=new ArrayList<NewsBean>();
@@ -52,7 +52,8 @@ public class MessageReceiver extends BroadcastReceiver {
     /**
      * 检查消息是否有跟新
      */
-    private void initData() {
+    private void initData(){
+        Log.i(TAG,"id="+MyApplication.id);
         OkHttpUtils.post().url(Strings.REQUEST_URL+"checkNews")
             .addParams("id",MyApplication.id)
             .build().execute(new StringCallback() {
@@ -90,6 +91,9 @@ public class MessageReceiver extends BroadcastReceiver {
 
             @Override
             public void onResponse(String response) {
+                Log.i(TAG,"请求消息内容为："+response);
+
+
                 Gson gson=new Gson();
                 Type listType=new TypeToken<List<NewsBean>>(){}.getType();
                 nlist=new ArrayList<NewsBean>();

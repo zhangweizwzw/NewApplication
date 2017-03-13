@@ -26,8 +26,7 @@ import org.xwalk.core.XWalkView;
 
 public class ThreeDFragment extends BaseFragment {
     private  View view;
-//    private WebView webView;
-    private WebSettings mWebSettings;
+    private WebView webView;
     private TextView title_center;
     private XWalkView xwalk;
 
@@ -62,7 +61,13 @@ public class ThreeDFragment extends BaseFragment {
 
 
     }
-//    @TargetApi(Build.VERSION_CODES.ECLAIR_MR1)
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    //    @TargetApi(Build.VERSION_CODES.ECLAIR_MR1)
 //    private void setUpViews() {
 //        title_center= (TextView)view.findViewById(R.id.title_center);
 //        title_center.setText("3D展示");
