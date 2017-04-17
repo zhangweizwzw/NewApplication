@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.Call;
+import okhttp3.FormBody;
+import okhttp3.RequestBody;
 
 
 public class LoginActivity extends BaseActivity implements View.OnClickListener {
@@ -130,6 +132,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     Toast.makeText(LoginActivity.this, Strings.LOGIN_NULL,Toast.LENGTH_SHORT).show();
                 }else{
                     //用户登录
+
                     OkHttpUtils
                             .post()
                             .url(Strings.REQUEST_URL+"login")
